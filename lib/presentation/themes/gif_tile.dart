@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Define tema claro e escuro para o app.
 class AppTheme {
   static final light = ThemeData(
     useMaterial3: true,

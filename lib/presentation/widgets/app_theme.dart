@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Widget reutilizável que exibe um GIF em um grid ou lista.
 class GifTile extends StatelessWidget {
   final String url;
   final String title;

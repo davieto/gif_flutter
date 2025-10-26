@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Tela simples de exemplo. Posteriormente, conecta com ManageFavorites.
 class FavoritesPage extends StatelessWidget {
   const FavoritesPage({super.key});
 

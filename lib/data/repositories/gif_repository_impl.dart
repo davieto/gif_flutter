@@ -3,7 +3,6 @@ import '../../domain/repositories/gif_repository.dart';
 import '../datasources/giphy_remote_datasource.dart';
 import '../datasources/local_storage_datasource.dart';
 
-/// Implementa os métodos definidos no domínio, unificando API e armazenamento local.
 class GifRepositoryImpl implements GifRepository {
   final GiphyRemoteDataSource remote;
   final LocalStorageDataSource local;
