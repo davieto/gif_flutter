@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Página de configurações (tema, idioma, rating etc.).
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 

@@ -16,7 +16,7 @@ class GiphyRemoteDataSource {
       final json = jsonDecode(res.body) as Map<String, dynamic>;
       return GifModel.fromJson(json['data']);
     } else {
-      throw Exception('Erro ao buscar GIF: ${res.statusCode}');
+      throw Exception('Erro ao buscar GIF (${res.statusCode})');
     }
   }
 }
