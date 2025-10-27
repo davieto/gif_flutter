@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/state/collections_provider.dart';
+import '../../application/state/preferences_provider.dart';
 import '../widgets/collection_dialog.dart';
+import 'collection_detail_page.dart';
 
 class CollectionsPage extends ConsumerWidget {
   const CollectionsPage({super.key});
@@ -10,6 +12,19 @@ class CollectionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final collections = ref.watch(collectionsProvider);
     final notifier = ref.read(collectionsProvider.notifier);
+    final prefs = ref.watch(preferencesProvider);
+
+    int columns;
+    switch (prefs.size) {
+      case 'small':
+        columns = 3;
+        break;
+      case 'large':
+        columns = 1;
+        break;
+      default:
+        columns = 2;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -19,12 +34,7 @@ class CollectionsPage extends ConsumerWidget {
             icon: const Icon(Icons.add),
             tooltip: 'Nova coleção',
             onPressed: () async {
-              // Abre o diálogo de criação
-              await showCollectionDialog(
-                context,
-                ref,
-                gifId: '', // aqui só cria a coleção, sem adicionar GIF
-              );
+              await showCollectionDialog(context, ref, gifId: '');
             },
           ),
         ],
@@ -39,30 +49,32 @@ class CollectionsPage extends ConsumerWidget {
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  childAspectRatio: 1.4,
+                  childAspectRatio: 1.3,
                 ),
                 itemCount: collections.length,
                 itemBuilder: (context, index) {
                   final c = collections[index];
                   return GestureDetector(
                     onTap: () {
-                      // Aqui você pode abrir uma nova tela mostrando os GIFs dessa coleção
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Abrindo coleção: ${c.name}')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CollectionDetailPage(collection: c),
+                        ),
                       );
                     },
                     onLongPress: () async {
-                      // Pergunta se o usuário quer excluir
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (ctx) => AlertDialog(
                           title: const Text('Excluir coleção'),
                           content: Text(
-                              'Tem certeza que deseja remover a coleção "${c.name}"?'),
+                            'Tem certeza que deseja remover "${c.name}"?',
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx, false),
@@ -79,14 +91,16 @@ class CollectionsPage extends ConsumerWidget {
                         notifier.deleteCollection(c.id);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Coleção "${c.name}" removida.'),
+                            content: Text(
+                              'Coleção "${c.name}" foi removida com sucesso.',
+                            ),
                           ),
                         );
                       }
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.pinkAccent.withOpacity(0.1),
+                        color: Colors.pinkAccent.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: Colors.pinkAccent.withOpacity(0.4),
@@ -97,14 +111,17 @@ class CollectionsPage extends ConsumerWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.folder, color: Colors.pinkAccent, size: 40),
+                            const Icon(
+                              Icons.folder,
+                              color: Colors.pinkAccent,
+                              size: 42,
+                            ),
                             const SizedBox(height: 8),
                             Text(
                               c.name,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: Colors.white,
                               ),
                               textAlign: TextAlign.center,
                             ),

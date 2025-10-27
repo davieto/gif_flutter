@@ -16,6 +16,7 @@ import 'collections_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
 }
@@ -58,7 +59,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       case 'history':
         body = const HistoryPage();
         break;
-      case 'trending':
       default:
         body = Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
@@ -92,10 +92,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 'title': g.title,
                               })
                           .toList(),
-                      isFavorite: (id) =>
-                          ref.read(favoritesProvider.notifier).isFavorite(id),
-                      onToggleFavorite: (id) =>
-                          ref.read(favoritesProvider.notifier).toggleFavorite(id),
+                      isFavorite: (id) => ref
+                          .read(favoritesProvider.notifier)
+                          .isFavorite(id),
+                      onToggleFavorite: (gifMap) => ref
+                          .read(favoritesProvider.notifier)
+                          .toggleFavorite(gifMap),
                       onAddToCollection: (id) =>
                           showCollectionDialog(context, ref, gifId: id),
                       onOpenLightbox: (_) {},
@@ -106,6 +108,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ],
           ),
         );
+        break;
     }
 
     return Scaffold(
