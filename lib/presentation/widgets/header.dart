@@ -1,51 +1,103 @@
 import 'package:flutter/material.dart';
 
 class Header extends StatelessWidget implements PreferredSizeWidget {
-  final Function(String view) onNavigate;
   final String currentView;
+  final Function(String) onNavigate;
   final int favoritesCount;
   final int collectionsCount;
 
   const Header({
     super.key,
-    required this.onNavigate,
     required this.currentView,
-    required this.favoritesCount,
-    required this.collectionsCount,
+    required this.onNavigate,
+    this.favoritesCount = 0,
+    this.collectionsCount = 0,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('GIFlix'),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      elevation: 0,
+      title: Row(
+        children: [
+          const Icon(Icons.movie_filter_outlined, color: Colors.pinkAccent),
+          const SizedBox(width: 8),
+          Text(
+            'GIFlix',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.trending_up),
+          tooltip: 'Explorar',
+          color: currentView == 'trending'
+              ? Colors.pinkAccent
+              : Colors.grey.shade300,
           onPressed: () => onNavigate('trending'),
         ),
-        IconButton(
-          icon: const Icon(Icons.favorite),
-          onPressed: () => onNavigate('favorites'),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.favorite),
+              tooltip: 'Favoritos',
+              color: currentView == 'favorites'
+                  ? Colors.pinkAccent
+                  : Colors.grey.shade300,
+              onPressed: () => onNavigate('favorites'),
+            ),
+            if (favoritesCount > 0)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    favoritesCount.toString(),
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                ),
+              ),
+          ],
         ),
         IconButton(
           icon: const Icon(Icons.folder_open),
+          tooltip: 'Coleções',
+          color: currentView == 'collections'
+              ? Colors.pinkAccent
+              : Colors.grey.shade300,
           onPressed: () => onNavigate('collections'),
         ),
-        PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value == 'dark') {
-              // trocar tema aqui
-            }
-          },
-          itemBuilder: (context) => const [
-            PopupMenuItem(value: 'light', child: Text('Claro')),
-            PopupMenuItem(value: 'dark', child: Text('Escuro')),
-          ],
-        )
+        IconButton(
+          icon: const Icon(Icons.history),
+          tooltip: 'Histórico',
+          color: currentView == 'history'
+              ? Colors.pinkAccent
+              : Colors.grey.shade300,
+          onPressed: () => onNavigate('history'),
+        ),
+        IconButton(
+          icon: const Icon(Icons.settings),
+          tooltip: 'Configurações',
+          color: currentView == 'settings'
+              ? Colors.pinkAccent
+              : Colors.grey.shade300,
+          onPressed: () => onNavigate('settings'),
+        ),
       ],
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(56);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

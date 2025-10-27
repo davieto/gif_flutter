@@ -62,24 +62,34 @@ class _GifCardState extends State<GifCard> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        widget.title,
-                        style: const TextStyle(color: Colors.white),
-                        textAlign: TextAlign.center,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Text(
+                          widget.title,
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(
-                            color: widget.isFavorite ? Colors.red : Colors.white,
+                            icon: Icon(
+                              widget.isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: widget.isFavorite
+                                  ? Colors.redAccent
+                                  : Colors.white,
+                            ),
                             onPressed: widget.onToggleFavorite,
-                            icon: const Icon(Icons.favorite),
                           ),
                           IconButton(
                             color: Colors.white,
-                            onPressed: widget.onAddToCollection,
                             icon: const Icon(Icons.add_box_outlined),
+                            tooltip: 'Adicionar à coleção',
+                            onPressed: widget.onAddToCollection,
                           ),
                         ],
                       ),
