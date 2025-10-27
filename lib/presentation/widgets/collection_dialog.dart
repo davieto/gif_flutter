@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../application/state/collections_provider.dart';
 
 Future<void> showCollectionDialog(
-  BuildContext context, {
-  required List<Map<String, dynamic>> collections,
-  required Function(String name) onCreateCollection,
-  required Function(String id) onAddToCollection,
-  required String selectedGifId,
+  BuildContext context,
+  WidgetRef ref, {
+  required String gifId,
 }) async {
-  final nameController = TextEditingController();
+  final collections = ref.watch(collectionsProvider);
+  final notifier = ref.read(collectionsProvider.notifier);
+  final controller = TextEditingController();
   bool creating = false;
 
   await showDialog(
@@ -16,66 +18,40 @@ Future<void> showCollectionDialog(
       builder: (ctx, setState) => AlertDialog(
         title: const Text('Adicionar à coleção'),
         content: creating
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Nome da coleção'),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            setState(() => creating = false);
-                            nameController.clear();
-                          },
-                          child: const Text('Cancelar'),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.add),
-                          label: const Text('Criar'),
-                          onPressed: nameController.text.trim().isEmpty
-                              ? null
-                              : () {
-                                  final c = nameController.text.trim();
-                                  onCreateCollection(c);
-                                  Navigator.pop(context);
-                                },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+            ? TextField(
+                controller: controller,
+                decoration:
+                    const InputDecoration(labelText: 'Nome da nova coleção'),
+                onSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    notifier.createCollection(value);
+                    setState(() => creating = false);
+                  }
+                },
               )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.create_new_folder_outlined),
-                    label: const Text('Nova coleção'),
-                    onPressed: () => setState(() => creating = true),
-                  ),
-                  const SizedBox(height: 8),
-                  ...collections.map((c) {
-                    final already = (c['gifIds'] as List)
-                        .contains(selectedGifId); // exemplo de estrutura
-                    return ListTile(
-                      title: Text('${c['name']} (${c['gifIds'].length})'),
-                      trailing: already
-                          ? const Icon(Icons.check, color: Colors.green)
-                          : null,
-                      onTap:
-                          already ? null : () => onAddToCollection(c['id']),
-                    );
-                  }),
-                ],
+            : SizedBox(
+                width: double.maxFinite,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.create_new_folder),
+                      label: const Text('Nova coleção'),
+                      onPressed: () => setState(() => creating = true),
+                    ),
+                    const Divider(),
+                    ...collections.map((c) {
+                      return ListTile(
+                        title: Text(c.name),
+                        trailing: Text('${c.gifIds.length} GIFs'),
+                        onTap: () {
+                          notifier.addGif(c.id, gifId);
+                          Navigator.pop(ctx);
+                        },
+                      );
+                    }).toList(),
+                  ],
+                ),
               ),
       ),
     ),

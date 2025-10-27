@@ -1,37 +1,78 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/datasources/giphy_remote_datasource.dart';
 import '../../domain/entities/gif_entity.dart';
-import '../../domain/usecases/get_random_gif.dart';
 
-/// Estado imutável do GIF (carregando, sucesso, erro)
 class GifState {
   final bool loading;
-  final GifEntity? gif;
+  final List<GifEntity> gifs;
   final String? error;
 
-  const GifState({this.loading = false, this.gif, this.error});
+  const GifState({
+    this.loading = false,
+    this.gifs = const [],
+    this.error,
+  });
 
-  GifState copyWith({bool? loading, GifEntity? gif, String? error}) {
+  GifState copyWith({
+    bool? loading,
+    List<GifEntity>? gifs,
+    String? error,
+  }) {
     return GifState(
       loading: loading ?? this.loading,
-      gif: gif ?? this.gif,
+      gifs: gifs ?? this.gifs,
       error: error,
     );
   }
 }
 
-/// Controlador de estado (Riverpod)
 class GifNotifier extends StateNotifier<GifState> {
-  final GetRandomGif getRandomGif;
+  final GiphyRemoteDataSource giphyApi;
 
-  GifNotifier(this.getRandomGif) : super(const GifState());
+  GifNotifier(this.giphyApi) : super(const GifState());
 
-  Future<void> fetchRandom() async {
+  Future<void> fetchTrending() async {
     state = state.copyWith(loading: true, error: null);
+
     try {
-      final gif = await getRandomGif();
-      state = state.copyWith(loading: false, gif: gif);
+      final result = await giphyApi.fetchTrending(limit: 25);
+      if (result.isEmpty) {
+        state = state.copyWith(loading: false, gifs: []);
+      } else {
+        state = state.copyWith(loading: false, gifs: result);
+      }
     } catch (e) {
-      state = state.copyWith(loading: false, error: e.toString());
+      state = state.copyWith(
+        loading: false,
+        error: 'Falha ao carregar GIFs: ${e.toString()}',
+      );
+    }
+  }
+
+  Future<void> searchGifs(String query) async {
+    if (query.trim().isEmpty) {
+      await fetchTrending();
+      return;
+    }
+
+    state = state.copyWith(loading: true, error: null);
+
+    try {
+      final result = await giphyApi.searchGifs(query, limit: 25);
+      if (result.isEmpty) {
+        state = state.copyWith(loading: false, gifs: []);
+      } else {
+        state = state.copyWith(loading: false, gifs: result);
+      }
+    } catch (e) {
+      state = state.copyWith(
+        loading: false,
+        error: 'Erro na busca: ${e.toString()}',
+      );
     }
   }
 }
+
+final gifProvider = StateNotifierProvider<GifNotifier, GifState>((ref) {
+  return GifNotifier(GiphyRemoteDataSource());
+});
