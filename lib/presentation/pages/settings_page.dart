@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../application/state/theme_provider.dart';
+import '../../application/state/preferences_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dark = ref.watch(themeProvider);
-    final notifier = ref.read(themeProvider.notifier);
+    final prefs = ref.watch(preferencesProvider);
+    final notifier = ref.read(preferencesProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Configurações')),
@@ -16,8 +16,8 @@ class SettingsPage extends ConsumerWidget {
         children: [
           SwitchListTile(
             title: const Text('Modo escuro'),
-            value: dark,
-            onChanged: (_) => notifier.toggleTheme(),
+            value: prefs.isDark,
+            onChanged: notifier.setTheme,
           ),
         ],
       ),

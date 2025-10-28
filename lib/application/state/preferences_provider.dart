@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqflite/sqflite.dart';
-import '../../data/database/app_database.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 final preferencesProvider =
     StateNotifierProvider<PreferencesNotifier, PreferencesState>(
@@ -44,55 +43,49 @@ class PreferencesNotifier extends StateNotifier<PreferencesState> {
   }
 
   Future<void> _load() async {
-    final db = await AppDatabase.instance.database;
-    final result = await db.query('preferences', limit: 1);
-    if (result.isNotEmpty) {
-      final row = result.first;
-      state = state.copyWith(
-        isDark: (row['darkMode'] as int? ?? 0) == 1,
-        rating: row['rating'] as String? ?? 'g',
-        language: row['language'] as String? ?? 'pt',
-        size: row['size'] as String? ?? 'medium',
-        autoplay: (row['autoplay'] as int? ?? 1) == 1,
-      );
-    } else {
-      await db.insert('preferences', {
-        'darkMode': 0,
-        'rating': 'g',
-        'language': 'pt',
-        'size': 'medium',
-        'autoplay': 1,
-      });
-    }
+    final box = Hive.box('preferences');
+    final darkMode = box.get('darkMode', defaultValue: false);
+    final rating = box.get('rating', defaultValue: 'g');
+    final language = box.get('language', defaultValue: 'pt');
+    final size = box.get('size', defaultValue: 'medium');
+    final autoplay = box.get('autoplay', defaultValue: true);
+
+    state = PreferencesState(
+      isDark: darkMode,
+      rating: rating,
+      language: language,
+      size: size,
+      autoplay: autoplay,
+    );
   }
 
-  Future<void> _save(Map<String, dynamic> data) async {
-    final db = await AppDatabase.instance.database;
-    await db.update('preferences', data);
+  Future<void> _save(String key, dynamic value) async {
+    final box = Hive.box('preferences');
+    await box.put(key, value);
   }
 
   Future<void> setTheme(bool dark) async {
-    await _save({'darkMode': dark ? 1 : 0});
+    await _save('darkMode', dark);
     state = state.copyWith(isDark: dark);
   }
 
   Future<void> setGifSize(String val) async {
-    await _save({'size': val});
+    await _save('size', val);
     state = state.copyWith(size: val);
   }
 
   Future<void> setRating(String val) async {
-    await _save({'rating': val});
+    await _save('rating', val);
     state = state.copyWith(rating: val);
   }
 
   Future<void> setLanguage(String val) async {
-    await _save({'language': val});
+    await _save('language', val);
     state = state.copyWith(language: val);
   }
 
   Future<void> setAutoplay(bool val) async {
-    await _save({'autoplay': val ? 1 : 0});
+    await _save('autoplay', val);
     state = state.copyWith(autoplay: val);
   }
 }

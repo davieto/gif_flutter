@@ -7,7 +7,7 @@ import '../widgets/loading_view.dart';
 import '../widgets/empty_view.dart';
 import '../widgets/error_view.dart';
 import '../widgets/gif_grid.dart';
-import '../widgets/search_bar.dart' as custom;
+import '../widgets/custom_search_bar.dart' as custom;
 import '../widgets/collection_dialog.dart';
 import 'favorites_page.dart';
 import 'settings_page.dart';
@@ -64,7 +64,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
           child: Column(
             children: [
-              custom.SearchBar(
+                custom.CustomSearchBar(
                 onSearch: (value) {
                   setState(() => query = value);
                   gifNotifier.searchGifs(value);

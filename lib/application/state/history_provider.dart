@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/database/app_database.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 final historyProvider =
     StateNotifierProvider<HistoryNotifier, List<String>>(
@@ -11,15 +11,14 @@ class HistoryNotifier extends StateNotifier<List<String>> {
   }
 
   Future<void> _load() async {
-    final db = await AppDatabase.instance.database;
-    final res = await db.query('history', orderBy: 'id DESC', limit: 20);
-    state = res.map((e) => e['query'] as String).toList();
+    final box = Hive.box('history');
+    state = box.values.cast<String>().toList().reversed.toList();
   }
 
   Future<void> addSearch(String query) async {
     if (query.trim().isEmpty) return;
-    final db = await AppDatabase.instance.database;
-    await db.insert('history', {'query': query});
+    final box = Hive.box('history');
+    await box.add(query);
     await _load();
   }
 }
