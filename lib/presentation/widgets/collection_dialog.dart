@@ -49,7 +49,7 @@ Future<void> showCollectionDialog(
                           Navigator.pop(ctx);
                         },
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),

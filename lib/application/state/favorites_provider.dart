@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqflite/sqflite.dart';
-import '../../data/database/app_database.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 final favoritesProvider =
     StateNotifierProvider<FavoritesNotifier, List<Map<String, dynamic>>>(
@@ -12,23 +11,21 @@ class FavoritesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   }
 
   Future<void> load() async {
-    final db = await AppDatabase.instance.database;
-    final result = await db.query('favorites');
-    state = result;
+    final box = Hive.box('favorites');
+    final items = box.values.cast<Map>().toList();
+    state = items.map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
   Future<void> toggleFavorite(Map<String, dynamic> gif) async {
-    final db = await AppDatabase.instance.database;
+    final box = Hive.box('favorites');
     final exists = state.any((e) => e['id'] == gif['id']);
 
     if (exists) {
-      await db.delete('favorites', where: 'id = ?', whereArgs: [gif['id']]);
+      final keyToRemove = box.keys
+          .firstWhere((k) => (box.get(k) as Map)['id'] == gif['id']);
+      await box.delete(keyToRemove);
     } else {
-      await db.insert('favorites', {
-        'id': gif['id'],
-        'title': gif['title'],
-        'url': gif['url'],
-      });
+      await box.add(gif);
     }
     await load();
   }

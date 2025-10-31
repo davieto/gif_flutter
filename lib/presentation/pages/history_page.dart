@@ -19,20 +19,20 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Future<void> _loadHistory() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() => history = prefs.getStringList('gif_history') ?? []);
+    setState(() => history = prefs.getStringList('search_history') ?? []);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Histórico')),
+      appBar: AppBar(title: const Text('Histórico de buscas')),
       body: history.isEmpty
-          ? const Center(child: Text('Nenhum GIF acessado recentemente.'))
+          ? const Center(child: Text('Nenhum termo buscado ainda.'))
           : ListView.builder(
               itemCount: history.length,
               itemBuilder: (context, i) => ListTile(
                 leading: const Icon(Icons.history),
-                title: Text('GIF ID: ${history[i]}'),
+                title: Text(history[i]),
               ),
             ),
     );
