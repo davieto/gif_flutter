@@ -23,17 +23,18 @@ class GiphyRemoteDataSource {
       final total = pagination != null && pagination['total_count'] != null
           ? (pagination['total_count'] as int)
           : data.length;
+
       final gifs = data.map((e) {
         final images = e['images'];
         return GifEntity(
           id: e['id'],
           title: e['title'] ?? '',
-          url:
-              images['downsized_medium']?['url'] ??
+          url: images['downsized_medium']?['url'] ??
               images['original']?['url'] ??
               '',
         );
       }).toList();
+
       return {'gifs': gifs, 'total': total};
     } else {
       throw Exception('Erro ${res.statusCode}');
@@ -61,18 +62,46 @@ class GiphyRemoteDataSource {
       final total = pagination != null && pagination['total_count'] != null
           ? (pagination['total_count'] as int)
           : data.length;
+
       final gifs = data.map((e) {
         final images = e['images'];
         return GifEntity(
           id: e['id'],
           title: e['title'] ?? '',
-          url:
-              images['downsized_medium']?['url'] ??
+          url: images['downsized_medium']?['url'] ??
               images['original']?['url'] ??
               '',
         );
       }).toList();
+
       return {'gifs': gifs, 'total': total};
+    } else {
+      throw Exception('Erro ${res.statusCode}');
+    }
+  }
+
+
+  Future<GifEntity> fetchRandom({
+    String tag = '',
+    String rating = 'g',
+  }) async {
+    final uri = Uri.https('api.giphy.com', '/v1/gifs/random', {
+      'api_key': ApiConstants.apiKey,
+      'tag': tag,
+      'rating': rating,
+    });
+
+    final res = await http.get(uri);
+    if (res.statusCode == 200) {
+      final body = jsonDecode(res.body) as Map<String, dynamic>;
+      final data = body['data'] as Map<String, dynamic>;
+      final images = data['images'] ?? {};
+
+      return GifEntity(
+        id: data['id'],
+        title: data['title'] ?? '',
+        url: images['original']?['url'] ?? '',
+      );
     } else {
       throw Exception('Erro ${res.statusCode}');
     }

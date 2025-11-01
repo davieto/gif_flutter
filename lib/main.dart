@@ -8,12 +8,16 @@ import 'application/state/preferences_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Inicializa o Hive
   await Hive.initFlutter();
+
+  // Abre todos os boxes usados no app
   await Hive.openBox('preferences');
   await Hive.openBox('favorites');
   await Hive.openBox('collections');
   await Hive.openBox('history');
 
+  // Inicializa o app com Riverpod
   runApp(const ProviderScope(child: GifFlutterApp()));
 }
 
@@ -26,7 +30,7 @@ class GifFlutterApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'GiGif',
+      title: 'GIFlix Flutter',
       theme: AppTheme.themeFromColor(prefs.primaryColor, isDark: false),
       darkTheme: AppTheme.themeFromColor(prefs.primaryColor, isDark: true),
       themeMode: prefs.isDark ? ThemeMode.dark : ThemeMode.light,

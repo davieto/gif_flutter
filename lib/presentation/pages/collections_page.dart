@@ -15,7 +15,7 @@ class CollectionsPage extends ConsumerWidget {
     final prefs = ref.watch(preferencesProvider);
 
     final primaryColor = Theme.of(context).colorScheme.primary;
-    final surface = Theme.of(context).colorScheme.surface;
+    // final surface = Theme.of(context).colorScheme.surface; // ❌ Removido (não usado)
 
     int columns;
     switch (prefs.size) {
@@ -91,24 +91,32 @@ class CollectionsPage extends ConsumerWidget {
                           ],
                         ),
                       );
+
+                      // ✅ Evita uso de context após await
+                      if (!context.mounted) return;
+
                       if (confirmed == true) {
                         await notifier.deleteCollection(c.id);
+
+                        if (!context.mounted) return; // segurança extra
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
                               'Coleção "${c.name}" foi removida com sucesso.',
                             ),
-                            backgroundColor: primaryColor,
+                            backgroundColor:
+                                primaryColor.withValues(alpha: 0.9), // ✅ atualizado
                           ),
                         );
                       }
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.15),
+                        color: primaryColor.withValues(alpha: 0.15), // ✅ atualizado
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: primaryColor.withOpacity(0.4),
+                          color: primaryColor.withValues(alpha: 0.4), // ✅ atualizado
                           width: 1.2,
                         ),
                       ),
@@ -128,9 +136,8 @@ class CollectionsPage extends ConsumerWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface,
+                                color:
+                                    Theme.of(context).colorScheme.onSurface,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -141,7 +148,7 @@ class CollectionsPage extends ConsumerWidget {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .onSurface
-                                    .withOpacity(0.7),
+                                    .withValues(alpha: 0.7), // ✅ atualizado
                                 fontSize: 12,
                               ),
                             ),

@@ -10,7 +10,10 @@ class GifRepositoryImpl implements GifRepository {
   GifRepositoryImpl(this.remote, this.local);
 
   @override
-  Future<GifEntity> getRandomGif({String tag = '', String rating = 'g'}) async {
+  Future<GifEntity> getRandomGif({
+    String tag = '',
+    String rating = 'g',
+  }) async {
     return await remote.fetchRandom(tag: tag, rating: rating);
   }
 
@@ -18,5 +21,5 @@ class GifRepositoryImpl implements GifRepository {
   Future<void> toggleFavorite(String id) => local.toggleFavorite(id);
 
   @override
-  Future<List<String>> getFavorites() => local.getFavorites();
+  Future<List<String>> getFavorites() => local.getFavoriteIds();
 }

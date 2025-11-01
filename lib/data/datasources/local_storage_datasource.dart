@@ -7,6 +7,8 @@ class LocalStorageDataSource {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getStringList(_favoritesKey) ?? [];
   }
+  
+  Future<List<String>> getFavorites() => getFavoriteIds();
 
   Future<void> toggleFavorite(String id) async {
     final prefs = await SharedPreferences.getInstance();
