@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/state/collections_provider.dart';
 import '../../application/state/preferences_provider.dart';
-import '../widgets/collection_dialog.dart';
 import 'collection_detail_page.dart';
+import '../widgets/collection_dialog.dart';
 
 class CollectionsPage extends ConsumerWidget {
   const CollectionsPage({super.key});
@@ -13,6 +13,9 @@ class CollectionsPage extends ConsumerWidget {
     final collections = ref.watch(collectionsProvider);
     final notifier = ref.read(collectionsProvider.notifier);
     final prefs = ref.watch(preferencesProvider);
+
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final surface = Theme.of(context).colorScheme.surface;
 
     int columns;
     switch (prefs.size) {
@@ -89,22 +92,24 @@ class CollectionsPage extends ConsumerWidget {
                         ),
                       );
                       if (confirmed == true) {
-                        notifier.deleteCollection(c.id);
+                        await notifier.deleteCollection(c.id);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
                               'Coleção "${c.name}" foi removida com sucesso.',
                             ),
+                            backgroundColor: primaryColor,
                           ),
                         );
                       }
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.pinkAccent.withOpacity(0.15),
+                        color: primaryColor.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.pinkAccent.withOpacity(0.4),
+                          color: primaryColor.withOpacity(0.4),
+                          width: 1.2,
                         ),
                       ),
                       child: Padding(
@@ -112,25 +117,31 @@ class CollectionsPage extends ConsumerWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.folder,
-                              color: Colors.pinkAccent,
+                              color: primaryColor,
                               size: 42,
                             ),
                             const SizedBox(height: 8),
                             Text(
                               c.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface,
                               ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '${c.gifIds.length} GIFs',
-                              style: const TextStyle(
-                                color: Colors.white70,
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withOpacity(0.7),
                                 fontSize: 12,
                               ),
                             ),

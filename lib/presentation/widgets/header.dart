@@ -16,17 +16,25 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final inactiveColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey.shade400
+        : Colors.grey.shade300;
+
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 0,
       title: Row(
         children: [
-          const Icon(Icons.movie_filter_outlined, color: Colors.pinkAccent),
+          Icon(
+            Icons.movie_filter_outlined,
+            color: primaryColor,
+          ),
           const SizedBox(width: 8),
           Text(
             'GIFlix',
             style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
+              color: primaryColor,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -36,9 +44,7 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.trending_up),
           tooltip: 'Explorar',
-          color: currentView == 'trending'
-              ? Colors.pinkAccent
-              : Colors.grey.shade300,
+          color: currentView == 'trending' ? primaryColor : inactiveColor,
           onPressed: () => onNavigate('trending'),
         ),
         Stack(
@@ -47,9 +53,7 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
             IconButton(
               icon: const Icon(Icons.favorite),
               tooltip: 'Favoritos',
-              color: currentView == 'favorites'
-                  ? Colors.pinkAccent
-                  : Colors.grey.shade300,
+              color: currentView == 'favorites' ? primaryColor : inactiveColor,
               onPressed: () => onNavigate('favorites'),
             ),
             if (favoritesCount > 0)
@@ -58,8 +62,8 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
                 right: 10,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
+                  decoration: BoxDecoration(
+                    color: primaryColor,
                     shape: BoxShape.circle,
                   ),
                   child: Text(
@@ -73,25 +77,13 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.folder_open),
           tooltip: 'Coleções',
-          color: currentView == 'collections'
-              ? Colors.pinkAccent
-              : Colors.grey.shade300,
+          color: currentView == 'collections' ? primaryColor : inactiveColor,
           onPressed: () => onNavigate('collections'),
-        ),
-        IconButton(
-          icon: const Icon(Icons.history),
-          tooltip: 'Histórico',
-          color: currentView == 'history'
-              ? Colors.pinkAccent
-              : Colors.grey.shade300,
-          onPressed: () => onNavigate('history'),
         ),
         IconButton(
           icon: const Icon(Icons.settings),
           tooltip: 'Configurações',
-          color: currentView == 'settings'
-              ? Colors.pinkAccent
-              : Colors.grey.shade300,
+          color: currentView == 'settings' ? primaryColor : inactiveColor,
           onPressed: () => onNavigate('settings'),
         ),
       ],

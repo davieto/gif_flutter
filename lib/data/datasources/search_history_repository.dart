@@ -16,11 +16,9 @@ class SearchHistoryRepository {
     term = term.trim();
     if (term.isEmpty) return;
 
-    // Remove repetições e coloca no topo
     history.remove(term);
     history.insert(0, term);
 
-    // Mantém só os últimos _maxHistory itens
     if (history.length > _maxHistory) {
       history.removeRange(_maxHistory, history.length);
     }

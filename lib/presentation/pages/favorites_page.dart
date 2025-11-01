@@ -22,10 +22,8 @@ class FavoritesPage extends ConsumerWidget {
       );
     }
 
-    // Favoritos armazenados localmente
     final favoriteGifs = favorites;
 
-    // ajustar colunas conforme tamanho definido em Configurações
     int columns;
     double spacing;
     switch (prefs.size) {

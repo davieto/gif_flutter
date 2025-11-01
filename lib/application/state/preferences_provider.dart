@@ -1,16 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-final preferencesProvider =
-    StateNotifierProvider<PreferencesNotifier, PreferencesState>(
-        (ref) => PreferencesNotifier());
-
 class PreferencesState {
   final bool isDark;
   final String rating;
   final String language;
   final String size;
   final bool autoplay;
+  final String primaryColor;
 
   const PreferencesState({
     this.isDark = false,
@@ -18,6 +15,7 @@ class PreferencesState {
     this.language = 'pt',
     this.size = 'medium',
     this.autoplay = true,
+    this.primaryColor = 'pink',
   });
 
   PreferencesState copyWith({
@@ -26,6 +24,7 @@ class PreferencesState {
     String? language,
     String? size,
     bool? autoplay,
+    String? primaryColor,
   }) {
     return PreferencesState(
       isDark: isDark ?? this.isDark,
@@ -33,6 +32,7 @@ class PreferencesState {
       language: language ?? this.language,
       size: size ?? this.size,
       autoplay: autoplay ?? this.autoplay,
+      primaryColor: primaryColor ?? this.primaryColor,
     );
   }
 }
@@ -44,18 +44,13 @@ class PreferencesNotifier extends StateNotifier<PreferencesState> {
 
   Future<void> _load() async {
     final box = Hive.box('preferences');
-    final darkMode = box.get('darkMode', defaultValue: false);
-    final rating = box.get('rating', defaultValue: 'g');
-    final language = box.get('language', defaultValue: 'pt');
-    final size = box.get('size', defaultValue: 'medium');
-    final autoplay = box.get('autoplay', defaultValue: true);
-
     state = PreferencesState(
-      isDark: darkMode,
-      rating: rating,
-      language: language,
-      size: size,
-      autoplay: autoplay,
+      isDark: box.get('darkMode', defaultValue: false),
+      rating: box.get('rating', defaultValue: 'g'),
+      language: box.get('language', defaultValue: 'pt'),
+      size: box.get('size', defaultValue: 'medium'),
+      autoplay: box.get('autoplay', defaultValue: true),
+      primaryColor: box.get('primaryColor', defaultValue: 'pink'),
     );
   }
 
@@ -88,4 +83,14 @@ class PreferencesNotifier extends StateNotifier<PreferencesState> {
     await _save('autoplay', val);
     state = state.copyWith(autoplay: val);
   }
+
+  Future<void> setColor(String val) async {
+    await _save('primaryColor', val);
+    state = state.copyWith(primaryColor: val);
+  }
 }
+
+final preferencesProvider =
+    StateNotifierProvider<PreferencesNotifier, PreferencesState>(
+  (ref) => PreferencesNotifier(),
+);

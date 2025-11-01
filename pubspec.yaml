@@ -20,6 +20,10 @@ dependencies:
   shared_preferences: ^2.3.2
   http: ^1.2.0
 
+
+  #  gerador de temas dinâmicos elegantes
+  flex_color_scheme: ^7.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
