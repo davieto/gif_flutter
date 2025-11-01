@@ -7,20 +7,15 @@ class Collection {
   final String name;
   final List<String> gifIds;
 
-  Collection({
-    required this.id,
-    required this.name,
-    required this.gifIds,
-  });
+  Collection({required this.id, required this.name, required this.gifIds});
 
-  Map<String, dynamic> toJson() =>
-      {'id': id, 'name': name, 'gifIds': gifIds};
+  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'gifIds': gifIds};
 
   factory Collection.fromJson(Map<String, dynamic> json) => Collection(
-        id: json['id'],
-        name: json['name'],
-        gifIds: List<String>.from(json['gifIds']),
-      );
+    id: json['id'],
+    name: json['name'],
+    gifIds: List<String>.from(json['gifIds']),
+  );
 }
 
 class CollectionsNotifier extends StateNotifier<List<Collection>> {
@@ -31,9 +26,7 @@ class CollectionsNotifier extends StateNotifier<List<Collection>> {
   Future<void> loadCollections() async {
     final prefs = await SharedPreferences.getInstance();
     final list = prefs.getStringList('collections') ?? [];
-    state = list
-        .map((e) => Collection.fromJson(jsonDecode(e)))
-        .toList();
+    state = list.map((e) => Collection.fromJson(jsonDecode(e))).toList();
   }
 
   Future<void> save() async {
@@ -58,12 +51,27 @@ class CollectionsNotifier extends StateNotifier<List<Collection>> {
         if (c.id == collectionId)
           Collection(id: c.id, name: c.name, gifIds: [...c.gifIds, gifId])
         else
-          c
+          c,
     ];
     await save();
   }
 
-    Future<void> deleteCollection(String id) async {
+  Future<void> removeGif(String collectionId, String gifId) async {
+    state = [
+      for (final c in state)
+        if (c.id == collectionId)
+          Collection(
+            id: c.id,
+            name: c.name,
+            gifIds: c.gifIds.where((id) => id != gifId).toList(),
+          )
+        else
+          c,
+    ];
+    await save();
+  }
+
+  Future<void> deleteCollection(String id) async {
     state = [
       for (final c in state)
         if (c.id != id) c,
@@ -74,5 +82,5 @@ class CollectionsNotifier extends StateNotifier<List<Collection>> {
 
 final collectionsProvider =
     StateNotifierProvider<CollectionsNotifier, List<Collection>>((ref) {
-  return CollectionsNotifier();
-});
+      return CollectionsNotifier();
+    });

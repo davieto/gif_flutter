@@ -63,7 +63,8 @@ class CollectionsPage extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => CollectionDetailPage(collection: c),
+                          builder: (_) =>
+                              CollectionDetailPage(collectionId: c.id),
                         ),
                       );
                     },
