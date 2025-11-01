@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/state/favorites_provider.dart';
-import '../../application/state/gif_provider.dart';
 import '../../application/state/preferences_provider.dart';
+import '../widgets/collection_dialog.dart';
 import '../widgets/gif_card.dart';
-import '../widgets/loading_view.dart';
 
 class FavoritesPage extends ConsumerWidget {
   const FavoritesPage({super.key});
@@ -13,7 +12,6 @@ class FavoritesPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites = ref.watch(favoritesProvider);
     final prefs = ref.watch(preferencesProvider);
-    final gifsState = ref.watch(gifProvider);
 
     if (favorites.isEmpty) {
       return const Center(
@@ -24,14 +22,8 @@ class FavoritesPage extends ConsumerWidget {
       );
     }
 
-    // GIFs favoritos visíveis
-    final favoriteGifs = gifsState.gifs
-        .where((g) => favorites.any((f) => f['id'] == g.id))
-        .toList();
-
-    if (favoriteGifs.isEmpty) {
-      return const LoadingView(message: 'Carregando seus favoritos...');
-    }
+    // Favoritos armazenados localmente
+    final favoriteGifs = favorites;
 
     // ajustar colunas conforme tamanho definido em Configurações
     int columns;
@@ -64,16 +56,13 @@ class FavoritesPage extends ConsumerWidget {
           itemBuilder: (context, i) {
             final gif = favoriteGifs[i];
             return GifCard(
-              imageUrl: gif.url,
-              title: gif.title,
+              imageUrl: gif['url'],
+              title: gif['title'],
               isFavorite: true,
               onToggleFavorite: () =>
-                  ref.read(favoritesProvider.notifier).toggleFavorite({
-                        'id': gif.id,
-                        'title': gif.title,
-                        'url': gif.url,
-                      }),
-              onAddToCollection: () {},
+                  ref.read(favoritesProvider.notifier).toggleFavorite(gif),
+              onAddToCollection: () =>
+                  showCollectionDialog(context, ref, gifId: gif['id']),
               onOpenLightbox: () {},
             );
           },
