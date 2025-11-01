@@ -64,7 +64,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
           child: Column(
             children: [
-                custom.CustomSearchBar(
+              custom.CustomSearchBar(
                 onSearch: (value) {
                   setState(() => query = value);
                   gifNotifier.searchGifs(value);
@@ -84,23 +84,59 @@ class _HomePageState extends ConsumerState<HomePage> {
                     if (gifState.gifs.isEmpty) {
                       return const EmptyView(message: 'Nenhum GIF encontrado');
                     }
-                    return GifGrid(
-                      gifs: gifState.gifs
-                          .map((g) => {
-                                'id': g.id,
-                                'url': g.url,
-                                'title': g.title,
-                              })
-                          .toList(),
-                      isFavorite: (id) => ref
-                          .read(favoritesProvider.notifier)
-                          .isFavorite(id),
-                      onToggleFavorite: (gifMap) => ref
-                          .read(favoritesProvider.notifier)
-                          .toggleFavorite(gifMap),
-                      onAddToCollection: (id) =>
-                          showCollectionDialog(context, ref, gifId: id),
-                      onOpenLightbox: (_) {},
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: GifGrid(
+                            gifs: gifState.gifs
+                                .map(
+                                  (g) => {
+                                    'id': g.id,
+                                    'url': g.url,
+                                    'title': g.title,
+                                  },
+                                )
+                                .toList(),
+                            isFavorite: (id) => ref
+                                .read(favoritesProvider.notifier)
+                                .isFavorite(id),
+                            onToggleFavorite: (gifMap) => ref
+                                .read(favoritesProvider.notifier)
+                                .toggleFavorite(gifMap),
+                            onAddToCollection: (id) =>
+                                showCollectionDialog(context, ref, gifId: id),
+                            onOpenLightbox: (_) {},
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Controle de paginação
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: gifState.currentPage > 1
+                                    ? () => gifNotifier.previousPage()
+                                    : null,
+                                child: const Text('Anterior'),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Página ${gifState.currentPage} de ${gifState.totalPages}',
+                              ),
+                              const SizedBox(width: 12),
+                              ElevatedButton(
+                                onPressed:
+                                    gifState.currentPage < gifState.totalPages
+                                    ? () => gifNotifier.nextPage()
+                                    : null,
+                                child: const Text('Próxima'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),
